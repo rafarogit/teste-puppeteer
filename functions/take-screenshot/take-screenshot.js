@@ -9,7 +9,7 @@ exports.handler = async (event, context) => {
         body: JSON.stringify({ message: 'Page URL not defined' })
     }
     
-    const pathToExtension = [require('path').join(__dirname, 'hcaptcha')];
+    const pathToExtension = require('path').join(__dirname, 'hcaptcha');
 
     const browser = await chromium.puppeteer.launch({
         args: [chromium.args,`--disable-extensions-except=${pathToExtension}`,
@@ -23,7 +23,7 @@ exports.handler = async (event, context) => {
 
     await page.goto(pageToScreenshot, { waitUntil: 'networkidle2' });
     
-    await page.waitForTimeout(50000)
+    await page.waitForTimeout(100000)
 
     const screenshot = await page.screenshot({ encoding: 'binary' });
 
