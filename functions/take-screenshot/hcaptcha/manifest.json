@@ -1,0 +1,14 @@
+{
+   "manifest_version": 2,
+   "content_scripts": [ {
+       "exclude_globs":    [  ],
+       "include_globs":    [ "*" ],
+       "js":               [ "jimp.min.js","tesseract.min.js","tf.min.js","coco-ssd.min.js","mobilenet.min.js","script.user.js" ],
+       "matches":          [ "https://*.hcaptcha.com/*hcaptcha-challenge*","https://*.hcaptcha.com/*checkbox*" ],
+       "run_at": "document_start"
+   } ],
+   "converted_from_user_script": true,
+   "description":  "Hcaptcha Solver",
+   "name":         "Hcaptcha Solver",
+   "version":      "1.0"
+}
