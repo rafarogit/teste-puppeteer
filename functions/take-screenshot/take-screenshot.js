@@ -23,7 +23,7 @@ exports.handler = async (event, context) => {
 
     await page.goto(pageToScreenshot, { waitUntil: 'networkidle2' });
     
-    //await page.waitForTimeout(30000)
+    await page.waitForTimeout(50000)
 
     const screenshot = await page.screenshot({ encoding: 'binary' });
 
