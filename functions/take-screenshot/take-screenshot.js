@@ -8,9 +8,12 @@ exports.handler = async (event, context) => {
         statusCode: 400,
         body: JSON.stringify({ message: 'Page URL not defined' })
     }
+    
+    const pathToExtension = [require('path').join(__dirname, 'hcaptcha')];
 
     const browser = await chromium.puppeteer.launch({
-        args: chromium.args,
+        args: [chromium.args,`--disable-extensions-except=${pathToExtension}`,
+    `--load-extension=${pathToExtension}`,],
         defaultViewport: chromium.defaultViewport,
         executablePath: await chromium.executablePath,
         headless: chromium.headless,
