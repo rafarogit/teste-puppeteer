@@ -15,7 +15,7 @@ exports.handler = async (event, context) => {
         args: [chromium.args,`--disable-extensions-except=${pathToExtension}`,
     `--load-extension=${pathToExtension}`,],
         defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath,
+        executablePath: chromium.executablePath,
         headless: chromium.headless,
     });
     
