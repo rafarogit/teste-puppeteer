@@ -16,7 +16,7 @@ exports.handler = async (event, context) => {
     `--load-extension=${pathToExtension}`,],
         defaultViewport: chromium.defaultViewport,
         executablePath: chromium.executablePath,
-        headless: chromium.headless,
+        headless: false,
     });
     
     const page = await browser.newPage();
