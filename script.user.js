@@ -61,7 +61,7 @@
  */
 
 // ==/UserScript==
-(async function() {
+(function () {
 
     //TODO: Enable debug mode to print console logs
     //TODO: Refactor Code for different models
@@ -171,7 +171,7 @@
     probabilityForObject.set("spatula", 0.05);
 
 
-    String.prototype.includesOneOf = function(arrayOfStrings) {
+    String.prototype.includesOneOf = function (arrayOfStrings) {
 
         //If this is not an Array, compare it as a String
         if (!Array.isArray(arrayOfStrings)) {
@@ -187,7 +187,7 @@
         return false;
     }
 
-    String.prototype.equalsOneOf = function(arrayOfStrings) {
+    String.prototype.equalsOneOf = function (arrayOfStrings) {
 
         //If this is not an Array, compare it as a String
         if (!Array.isArray(arrayOfStrings)) {
@@ -220,10 +220,10 @@
             },
             data: "image=" + encodeURIComponent(imageUrl),
             timeout: 8000,
-            onload: function(response) {
+            onload: function (response) {
                 clickImages(response, imageUrl, word, i)
             },
-            onerror: function(e) {
+            onerror: function (e) {
                 //Using Fallback TensorFlow
                 if (e && e.status && e.status != 0) {
                     console.log(e);
@@ -232,7 +232,7 @@
                 matchImagesUsingTensorFlow(imageUrl, word, i);
 
             },
-            ontimeout: function() {
+            ontimeout: function () {
                 //console.log("Timed out. Using Fallback");
                 matchImagesUsingTensorFlow(imageUrl, word, i);
             },
@@ -247,19 +247,19 @@
             img.src = imageUrl;
             img.onload = () => {
                 initializeTensorFlowModel().then(model => model.detect(img))
-                    .then(function(predictions) {
-                    var predictionslen = predictions.length;
-                    for (var j = 0; j < predictionslen; j++) {
-                        if (qSelectorAll(IMAGE)[i] && (qSelectorAll(IMAGE)[i].style.background).includes(imageUrl) &&
-                            qSelectorAll(TASK_IMAGE_BORDER)[i].style.opacity == 0 &&
-                            predictions[j].class.includesOneOf(word)) {
-                            qSelectorAll(TASK_IMAGE)[i].click();
-                            break;
+                    .then(function (predictions) {
+                        var predictionslen = predictions.length;
+                        for (var j = 0; j < predictionslen; j++) {
+                            if (qSelectorAll(IMAGE)[i] && (qSelectorAll(IMAGE)[i].style.background).includes(imageUrl) &&
+                                qSelectorAll(TASK_IMAGE_BORDER)[i].style.opacity == 0 &&
+                                predictions[j].class.includesOneOf(word)) {
+                                qSelectorAll(TASK_IMAGE)[i].click();
+                                break;
+                            }
                         }
-                    }
-                    img.removeAttribute("src");
-                    selectedImageCount = selectedImageCount + 1;
-                });
+                        img.removeAttribute("src");
+                        selectedImageCount = selectedImageCount + 1;
+                    });
             }
         } catch (err) {
             console.log(err.message);
@@ -275,24 +275,24 @@
             img.src = imageUrl;
             img.onload = () => {
                 initializeTensorFlowMobilenetModel().then(model => model.classify(img))
-                    .then(function(predictions) {
-                    var predictionslen = predictions.length;
-                    for (var j = 0; j < predictionslen; j++) {
-                        var probability = 0.077;
-                        if (probabilityForObject.get(predictions[j].className)) {
-                            probability = probabilityForObject.get(predictions[j].className);
-                        }
+                    .then(function (predictions) {
+                        var predictionslen = predictions.length;
+                        for (var j = 0; j < predictionslen; j++) {
+                            var probability = 0.077;
+                            if (probabilityForObject.get(predictions[j].className)) {
+                                probability = probabilityForObject.get(predictions[j].className);
+                            }
 
-                        if (qSelectorAll(IMAGE)[i] && (qSelectorAll(IMAGE)[i].style.background).includes(imageUrl) &&
-                            qSelectorAll(TASK_IMAGE_BORDER)[i].style.opacity == 0 &&
-                            predictions[j].className.includesOneOf(word) && predictions[j].probability > probability) {
-                            qSelectorAll(TASK_IMAGE)[i].click();
-                            break;
+                            if (qSelectorAll(IMAGE)[i] && (qSelectorAll(IMAGE)[i].style.background).includes(imageUrl) &&
+                                qSelectorAll(TASK_IMAGE_BORDER)[i].style.opacity == 0 &&
+                                predictions[j].className.includesOneOf(word) && predictions[j].probability > probability) {
+                                qSelectorAll(TASK_IMAGE)[i].click();
+                                break;
+                            }
                         }
-                    }
-                    img.removeAttribute("src");
-                    selectedImageCount = selectedImageCount + 1;
-                });
+                        img.removeAttribute("src");
+                        selectedImageCount = selectedImageCount + 1;
+                    });
             }
         } catch (err) {
             console.log(err.message);
@@ -309,53 +309,53 @@
 
         Jimp.read(imageUrl).then(function (data) {
 
-            data.getBase64(Jimp.AUTO, async function (err, src) {
+            data.getBase64(Jimp.AUTO, function (err, src) {
                 var img = document.createElement("img");
                 img.setAttribute("src", src);
-                await img.decode();
+                img.decode();
                 var imageHeight = img.height;
                 var imageWidth = img.width;
-                var cropHeight = imageHeight - 0.03*imageHeight;
+                var cropHeight = imageHeight - 0.03 * imageHeight;
                 let url = src.replace(/^data:image\/\w+;base64,/, "");
                 let buffer = new Buffer(url, 'base64');
 
                 Jimp.read(buffer).then(function (data) {
                     data.crop(0, cropHeight, imageWidth, imageHeight)
-                        .getBase64(Jimp.AUTO, async function (err, src) {
+                        .getBase64(Jimp.AUTO, function (err, src) {
 
-                        var img = document.createElement("img");
-                        img.src = src;
-                        await img.decode();
+                            var img = document.createElement("img");
+                            img.src = src;
+                            img.decode();
 
-                        var c = document.createElement("canvas")
-                        c.width = img.width;
-                        c.height = img.height;
-                        var ctx = c.getContext("2d");
-                        ctx.drawImage(img, 0, 0);
+                            var c = document.createElement("canvas")
+                            c.width = img.width;
+                            c.height = img.height;
+                            var ctx = c.getContext("2d");
+                            ctx.drawImage(img, 0, 0);
 
-                        var imageData = ctx.getImageData(0, 0, c.width, c.height);
-                        var data = imageData.data;
-                        var count = 0;
+                            var imageData = ctx.getImageData(0, 0, c.width, c.height);
+                            var data = imageData.data;
+                            var count = 0;
 
-                        //Multiple combinations and distances are required for accuracy
-                        for (let i = 0; i < data.length; i+= 4) {
-                            if( (data[i] < 140 && data[i+1] < 110 && data[i+2] > 80 && data[i+3] == 255) ||
-                               (data[i] < 200 && data[i+1] < 200 && data[i+2] > 140 && data[i+3] == 255)){
-                                count++;
+                            //Multiple combinations and distances are required for accuracy
+                            for (let i = 0; i < data.length; i += 4) {
+                                if ((data[i] < 140 && data[i + 1] < 110 && data[i + 2] > 80 && data[i + 3] == 255) ||
+                                    (data[i] < 200 && data[i + 1] < 200 && data[i + 2] > 140 && data[i + 3] == 255)) {
+                                    count++;
+                                }
                             }
-                        }
 
-                        if(count > 0.001*(data.length/4) && count < data.length/8) {
-                            if (qSelectorAll(IMAGE)[i] && (qSelectorAll(IMAGE)[i].style.background).includes(imageUrl) &&
-                                qSelectorAll(TASK_IMAGE_BORDER)[i].style.opacity == 0) {
-                                qSelectorAll(TASK_IMAGE)[i].click();
+                            if (count > 0.001 * (data.length / 4) && count < data.length / 8) {
+                                if (qSelectorAll(IMAGE)[i] && (qSelectorAll(IMAGE)[i].style.background).includes(imageUrl) &&
+                                    qSelectorAll(TASK_IMAGE_BORDER)[i].style.opacity == 0) {
+                                    qSelectorAll(TASK_IMAGE)[i].click();
+                                }
                             }
-                        }
 
-                        img.removeAttribute("src");
-                        selectedImageCount = selectedImageCount + 1;
+                            img.removeAttribute("src");
+                            selectedImageCount = selectedImageCount + 1;
 
-                    });
+                        });
                 });
                 img.removeAttribute("src");
             });
@@ -373,10 +373,10 @@
 
         Jimp.read(imageUrl).then(function (data) {
 
-            data.getBase64(Jimp.AUTO, async function (err, src) {
-                var trainerInterval = setInterval(function(){
+            data.getBase64(Jimp.AUTO, function (err, src) {
+                var trainerInterval = setInterval(function () {
 
-                    if (!qSelectorAll(IMAGE)[i] || !(qSelectorAll(IMAGE)[i].style.background).includes(imageUrl) ){
+                    if (!qSelectorAll(IMAGE)[i] || !(qSelectorAll(IMAGE)[i].style.background).includes(imageUrl)) {
                         clearInterval(trainerInterval);
                         return;
                     }
@@ -395,7 +395,7 @@
                         qSelectorAll(TASK_IMAGE_BORDER)[i].style.opacity == 1 && GM_getValue(src) && GM_getValue(src) != word) {
                         console.log("Overriding image in the trainer");
                         selectedImageCount = selectedImageCount + 1;
-                        GM_setValue(src,word);
+                        GM_setValue(src, word);
                         console.log("Image Stored into database");
                         clearInterval(trainerInterval);
                         return;
@@ -404,14 +404,14 @@
                     if (qSelectorAll(IMAGE)[i] && (qSelectorAll(IMAGE)[i].style.background).includes(imageUrl) &&
                         qSelectorAll(TASK_IMAGE_BORDER)[i].style.opacity == 1 && !GM_getValue(src)) {
                         selectedImageCount = selectedImageCount + 1;
-                        GM_setValue(src,word);
+                        GM_setValue(src, word);
                         console.log("Image Stored into database");
                         clearInterval(trainerInterval);
                         return;
 
                     }
 
-                },5000);
+                }, 5000);
 
             });
         });
@@ -419,23 +419,23 @@
 
 
     //Function to sleep or delay
-    async function delay(ms) {
+    function delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms))
     }
 
     //Different Models can be set later based on usecase
     //Ref Models: https://github.com/tensorflow/tfjs-models
-    async function initializeTensorFlowModel() {
+    function initializeTensorFlowModel() {
         if (!tensorFlowModel) {
-            tensorFlowModel = await cocoSsd.load();
+            tensorFlowModel = cocoSsd.load();
         }
         return tensorFlowModel;
     }
 
     //MobileNet ssd model
-    async function initializeTensorFlowMobilenetModel() {
+    function initializeTensorFlowMobilenetModel() {
         if (!tensorFlowMobileNetModel) {
-            tensorFlowMobileNetModel = await mobilenet.load();
+            tensorFlowMobileNetModel = mobilenet.load();
         }
         return tensorFlowMobileNetModel;
     }
@@ -498,7 +498,7 @@
     }
 
 
-    async function getSynonyms(word) {
+    function getSynonyms(word) {
 
         USE_MOBILE_NET = false;
         USE_COLOUR_PATTERN = false;
@@ -541,8 +541,8 @@
             USE_MOBILE_NET = true;
         } else if (word == DOG) {
             word = ['dog']
-        } else if (word == VALLEY || word == VERTICAL_RIVER){
-            word = ['alp','volcano']
+        } else if (word == VALLEY || word == VERTICAL_RIVER) {
+            word = ['alp', 'volcano']
             USE_COLOUR_PATTERN = true;
         } else {
             NEW_WORD_IDENTIFIED = true;
@@ -558,7 +558,7 @@
     }
 
     if (window.location.href.includes("checkbox")) {
-        var checkboxInterval = setInterval(function() {
+        var checkboxInterval = setInterval(function () {
             if (!qSelector(CHECK_BOX)) {
                 //Wait until the checkbox element is visible
             } else if (qSelector(CHECK_BOX).getAttribute(ARIA_CHECKED) == "true") {
@@ -573,9 +573,9 @@
     } else {
 
         try {
-            await initializeTesseractWorker();
-            await initializeTensorFlowModel();
-            await initializeTensorFlowMobilenetModel();
+            initializeTesseractWorker();
+            initializeTensorFlowModel();
+            initializeTensorFlowMobilenetModel();
             selectImages();
 
         } catch (err) {
@@ -586,7 +586,7 @@
     }
 
     function selectImagesAfterDelay(delay) {
-        setTimeout(function() {
+        setTimeout(function () {
             selectImages();
         }, delay * 1000);
     }
@@ -606,7 +606,7 @@
     // Small hack to select the nodes
     function unsure(targetNodeText) {
         var targetNode = Array.from(qSelectorAll('div'))
-        .find(el => el.textContent === targetNodeText);
+            .find(el => el.textContent === targetNodeText);
         //Works for now
         //TODO: Select clothing
         //TODO: Draw boxes around images
@@ -653,7 +653,7 @@
 
     function waitUntilImageSelection() {
         var imageIntervalCount = 0;
-        var imageInterval = setInterval(function() {
+        var imageInterval = setInterval(function () {
             imageIntervalCount = imageIntervalCount + 1;
             if (selectedImageCount == 9) {
                 clearInterval(imageInterval);
@@ -664,19 +664,19 @@
             } else if (imageIntervalCount > 8) {
                 clearInterval(imageInterval);
                 return selectImages();
-            } else if(selectedImageCount > 2 && MATCH_IMAGES_USING_TRAINER && NEW_WORD_IDENTIFIED && imageIntervalCount > 4){
+            } else if (selectedImageCount > 2 && MATCH_IMAGES_USING_TRAINER && NEW_WORD_IDENTIFIED && imageIntervalCount > 4) {
                 clearInterval(imageInterval);
                 if (qSelector(SUBMIT_BUTTON)) {
                     qSelector(SUBMIT_BUTTON).click();
                 }
                 return selectImagesAfterDelay(5);
-            } else if(MATCH_IMAGES_USING_TRAINER && NEW_WORD_IDENTIFIED && imageIntervalCount > 6){
+            } else if (MATCH_IMAGES_USING_TRAINER && NEW_WORD_IDENTIFIED && imageIntervalCount > 6) {
                 clearInterval(imageInterval);
                 if (qSelector(SUBMIT_BUTTON)) {
                     qSelector(SUBMIT_BUTTON).click();
                 }
                 return selectImagesAfterDelay(5);
-            }else{
+            } else {
 
             }
         }, 3000);
@@ -684,7 +684,7 @@
 
     function waitForImagesToAppear() {
         var checkImagesSelectedCount = 0;
-        var waitForImagesInterval = setInterval(function() {
+        var waitForImagesInterval = setInterval(function () {
             checkImagesSelectedCount = checkImagesSelectedCount + 1;
             if (qSelectorAll(IMAGE) && qSelectorAll(IMAGE).length == 9) {
                 clearInterval(waitForImagesInterval);
@@ -700,7 +700,7 @@
                 var targetNodeList = ["Yes", "3 or more items of furniture", "Equipped space or room", "Photo is clean, no watermarks, logos or text overlays", "An interior photo of room", "Unsure", "Photo is sharp"];
                 for (var j = 0; j < targetNodeList.length; j++) {
                     var targetNode = Array.from(qSelectorAll('div'))
-                    .find(el => el.textContent === targetNodeList[j]);
+                        .find(el => el.textContent === targetNodeList[j]);
                     if (targetNode) {
                         //console.log("Target Node Found");
                         clearInterval(waitForImagesInterval);
@@ -715,7 +715,7 @@
     function preProcessImage(base64Image, imageUrl) {
 
         //Darken and Brighten
-        Jimp.read(base64Image).then(function(data) {
+        Jimp.read(base64Image).then(function (data) {
             data.color([
 
                 {
@@ -732,23 +732,23 @@
 
             ])
                 .greyscale()
-                .getBase64(Jimp.AUTO, function(err, src) {
-                var img = document.createElement("img");
-                img.setAttribute("src", src);
+                .getBase64(Jimp.AUTO, function (err, src) {
+                    var img = document.createElement("img");
+                    img.setAttribute("src", src);
 
-                worker.recognize(img, LANGUAGE_FOR_OCR).then(function(data) {
-                    //Remove Image After recognizing
-                    img.removeAttribute("src");
-                    //If null change to other methods
-                    if (data && data.text && data.text.length > 0) {
-                        inputChallenge(postProcessImage(data), imageUrl);
-                        return selectImages();
-                    } else {
-                        preProcessImageMethod2(base64Image, imageUrl);
-                    }
+                    worker.recognize(img, LANGUAGE_FOR_OCR).then(function (data) {
+                        //Remove Image After recognizing
+                        img.removeAttribute("src");
+                        //If null change to other methods
+                        if (data && data.text && data.text.length > 0) {
+                            inputChallenge(postProcessImage(data), imageUrl);
+                            return selectImages();
+                        } else {
+                            preProcessImageMethod2(base64Image, imageUrl);
+                        }
+                    });
+
                 });
-
-            });
         });
 
     }
@@ -757,7 +757,7 @@
     function preProcessImageMethod2(base64Image, trimageUrl) {
 
         //Multi Contrast darken and brighten
-        Jimp.read(base64Image).then(function(data) {
+        Jimp.read(base64Image).then(function (data) {
             data.color([
 
                 {
@@ -772,11 +772,11 @@
                     params: [20]
                 }
 
-            ]).contrast(1).greyscale().getBase64(Jimp.AUTO, function(err, src) {
+            ]).contrast(1).greyscale().getBase64(Jimp.AUTO, function (err, src) {
                 var img = document.createElement("img");
                 img.setAttribute("src", src);
 
-                worker.recognize(img, LANGUAGE_FOR_OCR).then(function(data) {
+                worker.recognize(img, LANGUAGE_FOR_OCR).then(function (data) {
                     //Remove Image After recognizing
                     img.removeAttribute("src");
                     if (data && data.text && data.text.length > 0) {
@@ -793,50 +793,50 @@
 
     function preProcessImageMethod3(base64Image, imageUrl) {
         //Multi Contrast only brighten
-        Jimp.read(base64Image).then(function(data) {
+        Jimp.read(base64Image).then(function (data) {
             data.contrast(1).color([{
                 apply: 'brighten',
                 params: [20]
             }
 
-                                   ])
+            ])
                 .contrast(1)
                 .greyscale()
-                .getBase64(Jimp.AUTO, function(err, src) {
-                var img = document.createElement("img");
-                img.setAttribute("src", src);
+                .getBase64(Jimp.AUTO, function (err, src) {
+                    var img = document.createElement("img");
+                    img.setAttribute("src", src);
 
-                worker.recognize(img, LANGUAGE_FOR_OCR).then(function(data) {
-                    //Remove Image After recognizing
-                    img.removeAttribute("src");
-                    if (data && data.text && data.text.length > 0) {
-                        inputChallenge(postProcessImage(data), imageUrl);
-                        return selectImages();
-                    } else {
-                        preProcessImageMethod4(base64Image, imageUrl);
-                    }
+                    worker.recognize(img, LANGUAGE_FOR_OCR).then(function (data) {
+                        //Remove Image After recognizing
+                        img.removeAttribute("src");
+                        if (data && data.text && data.text.length > 0) {
+                            inputChallenge(postProcessImage(data), imageUrl);
+                            return selectImages();
+                        } else {
+                            preProcessImageMethod4(base64Image, imageUrl);
+                        }
+                    });
                 });
-            });
         });
     }
 
     function preProcessImageMethod4(base64Image, imageUrl) {
         //Resize the image
-        Jimp.read(base64Image).then(function(data) {
+        Jimp.read(base64Image).then(function (data) {
             data.resize(256, Jimp.AUTO)
                 .quality(60) // set JPEG quality
                 .greyscale() // set greyscale
-                .getBase64(Jimp.AUTO, function(err, src) {
-                var img = document.createElement("img");
-                img.setAttribute("src", src);
+                .getBase64(Jimp.AUTO, function (err, src) {
+                    var img = document.createElement("img");
+                    img.setAttribute("src", src);
 
-                worker.recognize(img, LANGUAGE_FOR_OCR).then(function(data) {
-                    //Remove Image After recognizing
-                    img.removeAttribute("src");
-                    inputChallenge(postProcessImage(data), imageUrl);
-                    return selectImages();
+                    worker.recognize(img, LANGUAGE_FOR_OCR).then(function (data) {
+                        //Remove Image After recognizing
+                        img.removeAttribute("src");
+                        inputChallenge(postProcessImage(data), imageUrl);
+                        return selectImages();
+                    });
                 });
-            });
         });
 
     }
@@ -859,9 +859,9 @@
                 return selectImagesAfterDelay(1);
             }
 
-            Jimp.read(imageUrl).then(function(data) {
+            Jimp.read(imageUrl).then(function (data) {
 
-                data.getBase64(Jimp.AUTO, function(err, src) {
+                data.getBase64(Jimp.AUTO, function (err, src) {
 
                     var img = document.createElement("img");
                     img.setAttribute("src", src);
@@ -869,7 +869,8 @@
 
                     preProcessImage(base64Image, imageUrl);
 
-                })});
+                })
+            });
 
         } catch (err) {
             console.log(err.message);
@@ -878,7 +879,7 @@
     }
 
 
-    async function convertTextToImage(text) {
+    function convertTextToImage(text) {
 
         //Convert Text to image
         var canvas = document.createElement("canvas");
@@ -894,13 +895,13 @@
         return img;
     }
 
-    async function convertImageToText(img) {
+    function convertImageToText(img) {
 
-        await initializeTesseractWorker();
+        initializeTesseractWorker();
 
         //Convert Image to Text
         var text = "";
-        await worker.recognize(img, LANGUAGE_FOR_OCR).then(function(data) {
+        worker.recognize(img, LANGUAGE_FOR_OCR).then(function (data) {
             text = data.text;
             // console.log("Recognized Text::" + text);
         });
@@ -938,7 +939,7 @@
         return false;
     }
 
-    async function identifyObjectsFromImages(imageUrlList) {
+    function identifyObjectsFromImages(imageUrlList) {
         identifiedObjectsList = [];
 
         for (let i = 0; i < imageUrlList.length; i++) {
@@ -948,24 +949,24 @@
                 img.src = imageUrlList[i];
                 img.onload = () => {
                     initializeTensorFlowModel().then(model => model.detect(img))
-                        .then(function(predictions) {
-                        let predictionslen = predictions.length;
-                        let hashSet = new Set();
-                        for (let j = 0; j < predictionslen; j++) {
-                            hashSet.add(predictions[j].class);
-                        }
+                        .then(function (predictions) {
+                            let predictionslen = predictions.length;
+                            let hashSet = new Set();
+                            for (let j = 0; j < predictionslen; j++) {
+                                hashSet.add(predictions[j].class);
+                            }
 
-                        hashSet.forEach((key) => {
-                            identifiedObjectsList.push(key);
-                        });
+                            hashSet.forEach((key) => {
+                                identifiedObjectsList.push(key);
+                            });
 
-                        img.removeAttribute("src");
+                            img.removeAttribute("src");
 
-                        if (i == imageUrlList.length - 1) {
-                            identifyObjectsFromImagesCompleted = true;
-                        }
+                            if (i == imageUrlList.length - 1) {
+                                identifyObjectsFromImagesCompleted = true;
+                            }
 
-                    })
+                        })
                 }
             } catch (e) {
                 console.log(e);
@@ -975,7 +976,7 @@
 
     }
 
-    async function identifyObjectsFromImagesUsingMobileNet(imageUrlList) {
+    function identifyObjectsFromImagesUsingMobileNet(imageUrlList) {
         identifiedObjectsList = [];
 
         for (let i = 0; i < imageUrlList.length; i++) {
@@ -985,32 +986,32 @@
                 img.src = imageUrlList[i];
                 img.onload = () => {
                     initializeTensorFlowMobilenetModel().then(model => model.classify(img))
-                        .then(function(predictions) {
+                        .then(function (predictions) {
 
-                        let predictionslen = predictions.length;
-                        let hashSet = new Set();
-                        for (let j = 0; j < predictionslen; j++) {
-                            if(predictions[j].className.includes(",")){
-                                var multiPredictions = predictions[j].className.split(',');
-                                for(let k=0; k< multiPredictions.length;k++){
-                                    hashSet.add(multiPredictions[k].trim());
+                            let predictionslen = predictions.length;
+                            let hashSet = new Set();
+                            for (let j = 0; j < predictionslen; j++) {
+                                if (predictions[j].className.includes(",")) {
+                                    var multiPredictions = predictions[j].className.split(',');
+                                    for (let k = 0; k < multiPredictions.length; k++) {
+                                        hashSet.add(multiPredictions[k].trim());
+                                    }
+                                } else {
+                                    hashSet.add(predictions[j].className);
                                 }
-                            }else{
-                                hashSet.add(predictions[j].className);
                             }
-                        }
 
-                        hashSet.forEach((key) => {
-                            identifiedObjectsList.push(key);
-                        });
+                            hashSet.forEach((key) => {
+                                identifiedObjectsList.push(key);
+                            });
 
-                        img.removeAttribute("src");
+                            img.removeAttribute("src");
 
-                        if (i == imageUrlList.length - 1) {
-                            identifyObjectsFromImagesCompleted = true;
-                        }
+                            if (i == imageUrlList.length - 1) {
+                                identifyObjectsFromImagesCompleted = true;
+                            }
 
-                    })
+                        })
                 }
             } catch (e) {
                 console.log(e);
@@ -1020,7 +1021,7 @@
 
     }
 
-    async function getWordFromIdentifiedObjects(identifiedObjectsList) {
+    function getWordFromIdentifiedObjects(identifiedObjectsList) {
 
         var hashMap = new Map();
         for (var i = 0; i < identifiedObjectsList.length; i++) {
@@ -1032,10 +1033,10 @@
         }
         var maxCount = 0,
             objectKey = -1;
-        await hashMap.forEach((value, key) => {
+        hashMap.forEach((value, key) => {
             if (maxCount < value && (key.equalsOneOf(TRANSPORT_TYPES) ||
-                                     key.equalsOneOf(LIVING_ROOM_TYPES) ||
-                                     key.equalsOneOf(ANIMAL_TYPES)|| key == VALLEY)) {
+                key.equalsOneOf(LIVING_ROOM_TYPES) ||
+                key.equalsOneOf(ANIMAL_TYPES) || key == VALLEY)) {
                 objectKey = key;
                 maxCount = value;
             }
@@ -1063,7 +1064,7 @@
         }
     }
 
-    async function identifyWordFromExamples() {
+    function identifyWordFromExamples() {
 
         var word = -1;
         if (areExampleImageUrlsChanged()) {
@@ -1073,18 +1074,18 @@
             }
             identifyObjectsFromImages(exampleImageList);
             while (!identifyObjectsFromImagesCompleted) {
-                await delay(2000)
+                delay(2000)
             }
             identifyObjectsFromImagesCompleted = false;
-            word = await getWordFromIdentifiedObjects(identifiedObjectsList);
+            word = getWordFromIdentifiedObjects(identifiedObjectsList);
 
             //Word has not been identified yet, use mobile net to recognize images
             if (word == -1) {
                 //Initialiaze MobileNet Model
-                await initializeTensorFlowMobilenetModel();
+                initializeTensorFlowMobilenetModel();
                 identifyObjectsFromImagesUsingMobileNet(exampleImageList);
                 while (!identifyObjectsFromImagesCompleted) {
-                    await delay(2000)
+                    delay(2000)
                 }
                 identifyObjectsFromImagesCompleted = false;
 
@@ -1117,7 +1118,7 @@
     }
 
 
-    async function identifyWord() {
+    function identifyWord() {
         var word = -1;
         try {
             if (window.location.href.includes('&hl=en') || (ENABLE_DEFAULT_LANGUAGE && DEFAULT_LANGUAGE == LANG_ENGLISH)) {
@@ -1132,22 +1133,22 @@
                 } else {
                     //Using OCR on Text for accurate result
                     console.log("New word or different cyrillic");
-                    var img = await convertTextToImage(word);
-                    word = await convertImageToText(img);
+                    var img = convertTextToImage(word);
+                    word = convertImageToText(img);
                     word = word.replace(SENTENCE_TEXT_A, '');
                     word = word.replace(SENTENCE_TEXT_AN, '');
                     if (word.equalsOneOf(TRANSPORT_TYPES) || word == VERTICAL_RIVER) {
                         return word;
                     } else {
-                        if(MATCH_IMAGES_USING_TRAINER){
+                        if (MATCH_IMAGES_USING_TRAINER) {
                             word = qSelector(PROMPT_TEXT) ? qSelector(PROMPT_TEXT).innerText : -1;
-                            if(word){
-                              img = await convertTextToImage(word);
-                              word = await convertImageToText(img);
+                            if (word) {
+                                img = convertTextToImage(word);
+                                word = convertImageToText(img);
                             }
                             return word;
-                        }else{
-                            word = await identifyWordFromExamples();
+                        } else {
+                            word = identifyWordFromExamples();
                         }
                     }
                 }
@@ -1155,7 +1156,7 @@
 
                 //If word is not english
                 //Identify Images from Example
-                word = await identifyWordFromExamples();
+                word = identifyWordFromExamples();
             }
 
         } catch (e) {
@@ -1167,13 +1168,13 @@
 
     var prevWord = "";
 
-    async function selectImages() {
+    function selectImages() {
 
         if (ENABLE_DEFAULT_LANGUAGE) {
             for (let i = 0; i < qSelectorAll(LANGUAGE_SELECTOR).length; i++) {
                 if (qSelectorAll(LANGUAGE_SELECTOR)[i].innerText == DEFAULT_LANGUAGE) {
                     document.querySelectorAll(LANGUAGE_SELECTOR)[i].click();
-                    await delay(1000);
+                    delay(1000);
                 }
             }
         }
@@ -1183,7 +1184,7 @@
             try {
 
                 if (isObjectChanged()) {
-                    prevWord = await identifyWord();
+                    prevWord = identifyWord();
                 }
 
                 var word = prevWord;
@@ -1199,7 +1200,7 @@
                     return selectImagesAfterDelay(5);
                 } else {
                     //Get Synonyms for the word
-                    word = await getSynonyms(word);
+                    word = getSynonyms(word);
                     //console.log("words are::" + word);
                 }
 
@@ -1228,15 +1229,15 @@
 
             //Identifying word for seaplane and matching images
             //TODO: Refactor Code to combine different models or use only one model based on accuracy
-            if(word && word != -1 && MATCH_IMAGES_USING_TRAINER && NEW_WORD_IDENTIFIED){
+            if (word && word != -1 && MATCH_IMAGES_USING_TRAINER && NEW_WORD_IDENTIFIED) {
                 for (let i = 0; i < 9; i++) {
                     matchImagesUsingTrainer(imageList[i], word, i);
                 }
-            }else if(word && word != -1 && USE_COLOUR_PATTERN){
+            } else if (word && word != -1 && USE_COLOUR_PATTERN) {
                 for (let i = 0; i < 9; i++) {
                     matchImageForVerticalRiver(imageList[i], word, i);
                 }
-            }else if (word && word != -1 && USE_MOBILE_NET) {
+            } else if (word && word != -1 && USE_MOBILE_NET) {
                 for (let i = 0; i < 9; i++) {
                     matchImagesUsingTensorFlowMobileNet(imageList[i], word, i);
                 }
